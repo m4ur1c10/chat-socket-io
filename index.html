@@ -2,24 +2,7 @@
 <html>
   <head>
     <title>Socket.IO chat</title>
-    <style>
-      * { margin: 0; padding: 0; box-sizing: border-box; }
-      body { font: 13px Helvetica, Arial; }
-      #users { position: fixed; background-color: #f1f1f1; border-left: 1px solid #ddd; right: 0; width: 20%; top: 0; height: 100%; }
-      #users .info-user-logged { padding: 10px; }
-      #users .info-user-logged #userLogged { font-weight: bold; }
-      #users ul { list-style-type: none; }
-      #users li { padding: 5px 10px; }
-      #msgBody form { background: #000; padding: 3px; position: fixed; bottom: 0; width: 80%; }
-      #msgBody form input { border: 0; padding: 10px; width: 59.5%; margin-right: .5%; }
-      #msgBody form select { border: 0; padding: 10px; width: 29.5%; margin-right: .5%; }
-      #msgBody form button { width: 9%; background: rgb(130, 224, 255); border: none; padding: 10px; }
-      #messages { list-style-type: none; margin: 0; padding: 0; }
-      #messages li { padding: 5px 10px; }
-      #messages li:nth-child(odd) { background: #eee; }
-      #messages { margin-bottom: 40px }
-      #msgBody { display: none }
-    </style>
+    <link href="chat.css" >
   </head>
   <body>
     <div id="msgBody">
@@ -46,87 +29,6 @@
     <script src="https://code.jquery.com/jquery-1.11.1.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/moment.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/locale/pt-br.js"></script>
-    <script>
-      $(function () {
-        
-        var socket = io();
-        var storage = window.localStorage;
-        var username = storage.getItem("nickname");
-        
-        if (!username) {
-          window.location.href = '/';
-        } else {
-          init();
-        }
-
-        function init() {
-
-          socket.emit('user logged', username);
-          
-          $("#userLoggedText").text(username);          
-          $("#msgBody").show();
-          montaTelaUsers();
-
-          $('#msgForm').submit(function(){
-            socket.emit('chat message', {user: username, to: $("#usersOnline").val(), msg: $('#m').val()});
-            $('#m').val('');
-            return false;
-          });
-
-          $("#logout").on('click', function(e){
-            e.preventDefault();
-            socket.emit('user logout', username);
-            storage.clear();
-            window.location.reload();
-          });
-          
-          socket.on('chat message', function(msg){          
-            //var dataTexto = moment().fromNow();
-            var dataTexto = '';
-            var msgTo = msg.to == 'all' ? 'Todos' : msg.to;
-            if (msg.user == $('#messages li.msgm:last-child p .user-send').text() 
-                  && msgTo == $('#messages li.msgm:last-child p .user-to').text() 
-                  && $('#messages li').length) {
-              $('#messages li.msgm:last-child').append('<p>'+msg.msg+' <small>'+dataTexto+'</small></p>');
-            } else {
-              ultimo_enviado = false;
-              $('#messages').append($('<li class="msgm">').html('<p><strong class="user-send">'+msg.user+'</strong> diz para <strong class="user-to">'+msgTo+'</strong>:</p><p>'+msg.msg+' <small>'+dataTexto+'</small></p>'));
-            }
-            window.scrollTo(0, document.body.scrollHeight);
-          });
-
-          socket.on('new user', function(user){
-            $('#messages').append($('<li>').html('<p><strong>'+user+'</strong> entrou na sala</p>'));
-            montaTelaUsers();
-          });
-
-          socket.on('user logout', function(user){
-            $('#messages').append($('<li>').html('<p><strong>'+user+'</strong> saiu da sala</p>'));
-            montaTelaUsers();
-          });
-        }
-
-        function montaTelaUsers() {
-          var usersHtml = '';
-          var usersOption = '<option value="all">Todos</option>';
-          $.get('/users', function(users){
-            
-            if (users.length) {
-              $.each(users, function(index,user){
-                if (user != username) {
-                  usersHtml += '<li>'+user+'</li>';
-                  usersOption += '<option value="'+user+'">'+user+'</option>';
-                }
-              });
-            } else {
-              usersHtml = '<li>Não ninguem no chat no momento.</li>';
-            }
-            $("#usersOnline").html(usersOption);
-            $("#usersLogged ul").html(usersHtml);
-          }, 'json');
-        }
-
-      });
-    </script>
+    <script src="chat.js"></script>
   </body>
 </html>
