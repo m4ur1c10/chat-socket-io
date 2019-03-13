@@ -1,0 +1,44 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Socket.IO chat</title>
+    <style>
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      body { font: 13px Helvetica, Arial; }
+      #loginBody { display: none; }
+      #loginForm { text-align: center; width: 100%; position: fixed; top: 30%; font-size: 36px; }
+      #loginForm input { height: 40px; width: 320px; border-radius: 10px; border: 1px solid #ddd; padding-left: 10px; font-size: 16px; }
+    </style>
+  </head>
+  <body>
+    <div id="loginBody">
+      <form id="loginForm">
+        <label>Enter your nickname:</label>
+        <br>
+        <input type="text" placeholder="Type your nickname" autocomplete="off">
+      </form>
+    </div>
+    <script src="https://code.jquery.com/jquery-1.11.1.js"></script>
+    <script>
+      $(function () {
+        
+        var storage = window.localStorage;
+        var username = storage.getItem("nickname");
+        
+        if (username) {
+          window.location.href = '/chat';
+        } else {
+          $("#loginBody").show();
+        }
+
+        $("#loginForm").submit(function(e){
+          e.preventDefault();
+          username = $(this).find("input[type=text]").val();
+          storage.setItem("nickname", username);
+          window.location.href = '/chat';
+        });
+
+      });
+    </script>
+  </body>
+</html>
